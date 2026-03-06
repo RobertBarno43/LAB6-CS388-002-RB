@@ -1,20 +1,11 @@
 package com.codepath.lab6
 
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.codepath.lab6.databinding.ActivityMainBinding
-import com.codepath.asynchttpclient.AsyncHttpClient
-import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.serialization.json.Json
-import okhttp3.Headers
-import org.json.JSONException
 
 // Helper function for JSON parsing
 fun createJson() = Json {
@@ -36,25 +27,24 @@ class MainActivity : AppCompatActivity() {
         val view = binding.root
         setContentView(view)
 
-        val fragmentManager : FragmentManager = supportFragmentManager
-        val parksFragment : ParksFragment = ParksFragment()
-        val campgroundFragment : CampgroundFragment = CampgroundFragment()
-
-        val bottomNavigationView: BottomNavigationView = findViewById(R.id.bottom_navigation)
+        val bottomNavigationView = binding.bottomNavigation
 
         // handle navigation selection
         bottomNavigationView.setOnItemSelectedListener { item ->
-            lateinit var fragment: Fragment
-            when (item.itemId) {
-                    R.id.nav_parks -> fragment = parksFragment
-                R.id.nav_campgrounds -> fragment = campgroundFragment
+            val fragment: Fragment = when (item.itemId) {
+                R.id.nav_parks -> ParksFragment()
+                R.id.nav_campgrounds -> CampgroundFragment()
+                R.id.nav_settings -> SettingsFragment()
+                else -> ParksFragment()
             }
             replaceFragment(fragment)
             true
         }
 
-        // Set default selection
-        bottomNavigationView.selectedItemId = R.id.nav_parks
+        // Set default selection only on first creation
+        if (savedInstanceState == null) {
+            bottomNavigationView.selectedItemId = R.id.nav_parks
+        }
     }
 
     private fun replaceFragment(fragment: Fragment) {
